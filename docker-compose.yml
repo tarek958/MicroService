@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  user-service:
+    build: ./services/user-service
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgres://user:password@db/users
+    depends_on:
+      - db
+
+  post-service:
+    build: ./services/post-service
+    ports:
+      - "3001:3001"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/social
+    depends_on:
+      - mongo
+
+  graphql-gateway:
+    build: ./services/graphql-gateway
+    ports:
+      - "4000:4000"
+  notification-service:
+    build: ./services/notification-service
+    ports:
+      - "3002:3002"
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: users
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  mongo:
+    image: mongo
+    volumes:
+      - mongodata:/data/db
+
+volumes:
+  pgdata:
+  mongodata:
